@@ -1,189 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Digital Food Menu with Online OTP</title>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Poppins, sans-serif;}
-    body{
-      background:url('https://cdn.pixabay.com/photo/2016/03/05/19/02/fish-1238395_1280.jpg') center/cover no-repeat;
-      height:100vh;display:flex;align-items:center;justify-content:center;
-    }
-    .container{background:rgba(0,0,0,0.8);padding:30px;border-radius:20px;width:90%;max-width:400px;color:#fff;text-align:center;box-shadow:0 0 15px #00eaff;}
-    h1{color:#00eaff;margin-bottom:20px;}
-    input,button{width:100%;padding:12px;margin:10px 0;border:none;border-radius:8px;font-size:16px;}
-    input{background:#222;color:#fff;}
-    button{background:#00eaff;color:#000;font-weight:bold;cursor:pointer;}
-    button:hover{background:#00c2d3;}
-    .hidden{display:none;}
-    .menu,.admin-dashboard{display:none;}
-    .food-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
-    .food-card{background:#111;padding:10px;border-radius:10px;color:#fff;text-align:center;box-shadow:0 0 8px #00eaff;}
-    .food-card img{width:100%;border-radius:8px;height:100px;object-fit:cover;}
-    .filter-buttons button{margin:5px;width:auto;padding:8px 15px;}
-    table{width:100%;border-collapse:collapse;margin-top:15px;}
-    th,td{border:1px solid #00eaff;padding:8px;text-align:center;}
-  </style>
-</head>
-<body>
-  <div class="container" id="login-type">
-    <h1>Login as</h1>
-    <button onclick="showCustomerLogin()">Customer</button>
-    <button onclick="showAdminLogin()">Admin</button>
-  </div>
-
-  <div class="container hidden" id="customer-auth">
-    <h1>Customer Login</h1>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginPassword" placeholder="Password">
-    <button onclick="customerLogin()">Login</button>
-    <p>New user? <a href="#" onclick="showSignup()">Sign up</a></p>
-    <button onclick="backHome()">Back</button>
-  </div>
-
-  <div class="container hidden" id="signup">
-    <h1>Customer Signup</h1>
-    <input type="text" id="signupName" placeholder="Name">
-    <input type="email" id="signupEmail" placeholder="Email">
-    <input type="password" id="signupPassword" placeholder="Password">
-    <button onclick="sendOTP()">Send OTP</button>
-    <div id="otpSection" class="hidden">
-      <input type="text" id="otpInput" placeholder="Enter OTP">
-      <button onclick="verifyOTP()">Verify OTP</button>
-    </div>
-    <button onclick="backHome()">Back</button>
-  </div>
-
-  <div class="container hidden menu" id="menu">
-    <h1>🍽 Digital Menu</h1>
-    <div class="filter-buttons">
-      <button onclick="filterMenu('all')">All</button>
-      <button onclick="filterMenu('veg')">Veg</button>
-      <button onclick="filterMenu('nonveg')">Non-Veg</button>
-      <button onclick="filterMenu('drinks')">Drinks</button>
-    </div>
-    <div class="food-grid" id="foodGrid"></div>
-    <button onclick="logout()">Logout</button>
-  </div>
-
-  <div class="container hidden" id="admin-login">
-    <h1>Admin Login</h1>
-    <input type="email" id="adminEmail" placeholder="Admin Email">
-    <input type="password" id="adminPassword" placeholder="Password">
-    <button onclick="adminLogin()">Login</button>
-    <button onclick="backHome()">Back</button>
-  </div>
-
-  <div class="container hidden admin-dashboard" id="admin-dashboard">
-    <h1>Admin Dashboard</h1>
-    <table id="customerTable">
-      <tr><th>Name</th><th>Email</th><th>Password</th></tr>
-    </table>
-    <button onclick="logout()">Logout</button>
-  </div>
-
-  <script>
-    emailjs.init("YOUR_PUBLIC_KEY"); // 🔹 Replace with your EmailJS public key
-    let generatedOTP = "", tempUser = {};
-
-    function showCustomerLogin(){toggleView('login-type','customer-auth');}
-    function showAdminLogin(){toggleView('login-type','admin-login');}
-    function showSignup(){toggleView('customer-auth','signup');}
-    function backHome(){toggleView(document.querySelector('.container:not(.hidden)').id,'login-type');}
-
-    function toggleView(hideId, showId){
-      document.getElementById(hideId).classList.add('hidden');
-      document.getElementById(showId).classList.remove('hidden');
-    }
-
-    function sendOTP(){
-      const name=document.getElementById('signupName').value.trim();
-      const email=document.getElementById('signupEmail').value.trim();
-      const password=document.getElementById('signupPassword').value.trim();
-
-      if(!name||!email||!password){alert("Please fill all fields");return;}
-
-      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      tempUser={name,email,password};
-
-      emailjs.send("YOUR_SERVICE_ID","YOUR_TEMPLATE_ID",{
-        to_name: name,
-        otp: generatedOTP
-      })
-      .then(()=>{alert("OTP sent to your email!");document.getElementById('otpSection').classList.remove('hidden');})
-      .catch(()=>alert("Failed to send OTP. Check EmailJS config."));
-    }
-
-    function verifyOTP(){
-      const entered=document.getElementById('otpInput').value.trim();
-      if(entered===generatedOTP){
-        const customers=JSON.parse(localStorage.getItem('customers')||'[]');
-        customers.push(tempUser);
-        localStorage.setItem('customers',JSON.stringify(customers));
-        alert("Signup successful!");
-        toggleView('signup','customer-auth');
-      } else alert("Incorrect OTP!");
-    }
-
-    function customerLogin(){
-      const email=document.getElementById('loginEmail').value.trim();
-      const pass=document.getElementById('loginPassword').value.trim();
-      const customers=JSON.parse(localStorage.getItem('customers')||'[]');
-      const user=customers.find(u=>u.email===email && u.password===pass);
-      if(user){toggleView('customer-auth','menu');loadMenu();}
-      else alert("Invalid credentials");
-    }
-
-    const foodItems=[
-      {name:'Paneer Butter Masala',type:'veg',img:'https://cdn.pixabay.com/photo/2022/09/27/19/36/paneer-7481958_1280.jpg'},
-      {name:'Chicken Biryani',type:'nonveg',img:'https://cdn.pixabay.com/photo/2020/03/13/07/44/biryani-4920468_1280.jpg'},
-      {name:'Veg Salad',type:'veg',img:'https://cdn.pixabay.com/photo/2016/03/05/19/02/salad-1238394_1280.jpg'},
-      {name:'Fish Fry',type:'nonveg',img:'https://cdn.pixabay.com/photo/2021/09/02/09/50/fried-fish-6593432_1280.jpg'},
-      {name:'Fresh Juice',type:'drinks',img:'https://cdn.pixabay.com/photo/2017/08/06/13/41/juice-2592237_1280.jpg'}
-    ];
-
-    function loadMenu(filter='all'){
-      const grid=document.getElementById('foodGrid');
-      grid.innerHTML='';
-      foodItems.filter(f=>filter==='all'||f.type===filter).forEach(f=>{
-        const card=document.createElement('div');
-        card.className='food-card';
-        card.innerHTML=`<img src="${f.img}"><h3>${f.name}</h3><p>${f.type}</p>`;
-        grid.appendChild(card);
-      });
-    }
-
-    function filterMenu(type){loadMenu(type);}
-    function logout(){location.reload();}
-
-    function adminLogin(){
-      const email=document.getElementById('adminEmail').value.trim();
-      const pass=document.getElementById('adminPassword').value.trim();
-      if(email==='admin@gmail.com' && pass==='12345'){
-        toggleView('admin-login','admin-dashboard');
-        loadCustomers();
-      }else alert("Invalid admin credentials");
-    }
-
-    function loadCustomers(){
-      const customers=JSON.parse(localStorage.getItem('customers')||'[]');
-      const table=document.getElementById('customerTable');
-      table.innerHTML='<tr><th>Name</th><th>Email</th><th>Password</th></tr>';
-      customers.forEach(c=>{
-        table.innerHTML+=`<tr><td>${c.name}</td><td>${c.email}</td><td>${c.password}</td></tr>`;
-      });
-    }
-  </script>
-</body>
-</html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Food Menu System</title>
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 
 body{
   min-height:100vh;
-  background:url('content://com.android.providers.media.documents/document/image%3A1000127317') center/cover no-repeat;
+  background:url('https://cdn.pixabay.com/photo/2021/01/25/14/12/restaurant-5947687_1280.jpg') center/cover no-repeat;
   color:#fff;
   display:flex;
   justify-content:center;
@@ -328,7 +155,13 @@ th{background:rgba(0,0,0,0.4);}
   <button onclick="logout()">Logout</button>
 </div>
 
+<!-- EmailJS and App Script -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
+(function() {
+    emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS Public Key
+})();
+
 const customerBtn=document.getElementById('customerBtn');
 const adminBtn=document.getElementById('adminBtn');
 const loginTypeBox=document.getElementById('loginTypeBox');
@@ -372,7 +205,22 @@ toggleSignup.addEventListener('click',(e)=>{
   }
 });
 
-loginBtn.addEventListener('click',()=>{
+async function sendOTP(email, otp) {
+    try {
+        await emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+            to_email: email,
+            from_name: "Digital Food Menu System",
+            otp: otp
+        });
+        return true;
+    } catch (error) {
+        console.error("EmailJS Error:", error);
+        alert("Failed to send OTP. Check EmailJS config.");
+        return false;
+    }
+}
+
+loginBtn.addEventListener('click', async ()=>{
   const fullname=document.getElementById('fullname').value.trim();
   const email=document.getElementById('email').value.trim();
   const phone=document.getElementById('phone').value.trim();
@@ -413,12 +261,18 @@ loginBtn.addEventListener('click',()=>{
               return;
           }
           generatedOTP=Math.floor(100000+Math.random()*900000).toString();
-          errorMsg.style.color='#00ff00';
-          errorMsg.innerHTML=`📱 OTP sent to ${phone}: <b>${generatedOTP}</b> (demo)`;
-          pendingUser={fullname,email,phone,password};
-          isVerifyingOTP=true;
-          otpField.style.display='block';
-          loginBtn.textContent='Verify OTP';
+          const sent = await sendOTP(email, generatedOTP);
+          if(sent){
+              errorMsg.style.color='#00ff00';
+              errorMsg.textContent='✅ OTP sent to your email.';
+              pendingUser={fullname,email,phone,password};
+              isVerifyingOTP=true;
+              otpField.style.display='block';
+              loginBtn.textContent='Verify OTP';
+          } else {
+              errorMsg.style.color='red';
+              errorMsg.textContent='❌ Failed to send OTP. Try again.';
+          }
       }else{
           const user=customers.find(c=>c.email===email && c.password===password);
           if(user){
@@ -454,7 +308,7 @@ function showCustomerList(){
   }
 }
 
-// --- Food Items with Images ---
+// Food Items
 const foodItems=[
   {name:'Paneer Butter Masala',type:'veg',img:'https://cdn.pixabay.com/photo/2020/08/02/06/07/indian-food-5451441_1280.jpg'},
   {name:'Veg Biryani',type:'veg',img:'https://cdn.pixabay.com/photo/2017/12/09/08/18/biryani-3009795_1280.jpg'},
@@ -481,7 +335,7 @@ function renderMenu(items){
   });
 }
 
-// --- Filter Buttons ---
+// Filter Buttons
 document.getElementById('showVeg').onclick=()=>renderMenu(foodItems.filter(i=>i.type==='veg'));
 document.getElementById('showNonVeg').onclick=()=>renderMenu(foodItems.filter(i=>i.type==='nonveg'));
 document.getElementById('showDrinks').onclick=()=>renderMenu(foodItems.filter(i=>i.type==='drinks'));
