@@ -5,305 +5,236 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Food Menu System</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-
-body{
-  min-height:100vh;
-  background:#111 url('https://cdn.pixabay.com/photo/2016/03/05/19/02/fish-1238395_1280.jpg') center/cover no-repeat;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  position:relative;
-}
-body::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.7);
-  backdrop-filter:blur(4px);
-  z-index:0;
-}
-.container{
-  width:400px;
-  background:rgba(255,255,255,0.08);
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 0 20px rgba(0,255,255,0.3);
-  backdrop-filter:blur(10px);
-  text-align:center;
-  position:relative;
-  z-index:1;
-}
-h2{margin-bottom:20px;color:#00eaff;}
-.input-group{margin:15px 0;text-align:left;}
-.input-group label{display:block;margin-bottom:6px;font-weight:600;}
-.input-group input{
-  width:100%;padding:10px;border:none;
-  border-radius:8px;background:rgba(255,255,255,0.1);
-  color:#fff;outline:none;}
-button{
-  width:100%;padding:10px;background:#00eaff;
-  border:none;border-radius:8px;font-weight:600;
-  cursor:pointer;transition:0.3s;}
-button:hover{background:#00cce7;}
-.error-msg{margin-top:10px;font-size:14px;color:red;}
-#menuPage,#adminDashboard{display:none;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border:1px solid rgba(255,255,255,0.2);padding:8px;text-align:left;}
-th{background:rgba(0,0,0,0.4);}
-.menu-container{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-  gap:10px;
-}
-.card{
-  background:rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:15px;
-  box-shadow:0 0 15px rgba(0,255,255,0.3);
-  text-align:center;
-}
-.card img{
-  width:100%;
-  height:100px;
-  object-fit:cover;
-  border-radius:10px;
-  margin-bottom:10px;
-}
-.card h4{color:#00eaff;margin-bottom:5px;}
-.card p{font-size:13px;color:#fff;}
-.small-btn{
-  padding:5px 10px;
-  font-size:12px;
-  margin-top:5px;
-  background:#ff4444;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-.small-btn:hover{background:#ff6666;}
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Poppins, sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .container {
+    width: 90%;
+    max-width: 400px;
+    background: rgba(0,0,0,0.7);
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 50px;
+    text-align: center;
+  }
+  input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+  }
+  input { background: #fff; color: #000; }
+  button { background: #00eaff; color: #000; font-weight: 600; cursor: pointer; }
+  h2 { margin-bottom: 15px; }
+  #menuList div {
+    background: rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+  .back-btn {
+    background: #ff0066;
+    color: #fff;
+  }
 </style>
 </head>
 <body>
 
-<!-- Choose Login Type -->
-<div class="container" id="loginTypeBox">
-  <h2>Login As</h2>
-  <button id="customerBtn">Customer</button>
-  <button id="adminBtn" style="margin-top:10px;">Admin</button>
-</div>
-
-<!-- Customer Login / Register -->
-<div class="container" id="customerLogin" style="display:none;">
-  <h2 id="formTitle">Customer Login</h2>
-  <div class="input-group">
-    <label>Full Name</label>
-    <input type="text" id="fullname" placeholder="Enter your name">
-  </div>
-  <div class="input-group">
-    <label>Phone Number</label>
-    <input type="tel" id="phone" placeholder="Enter your phone" maxlength="10">
-  </div>
-  <button id="loginBtn">Login / Register</button>
-  <p class="error-msg" id="errorMsg"></p>
-</div>
-
-<!-- Customer Menu Page -->
-<div class="container" id="menuPage">
+<div class="container" id="mainPage">
   <h2>Digital Food Menu</h2>
-  <div class="menu-container" id="menuItems"></div>
-  <button onclick="logout()">Logout</button>
+  <button onclick="showUserLogin()">User Login / Signup</button>
+  <button onclick="showAdminLogin()">Admin Login</button>
+</div>
+
+<!-- User Login -->
+<div class="container" id="userLogin" style="display:none;">
+  <h2>User Login / Signup</h2>
+  <input type="text" id="userName" placeholder="Full Name">
+  <input type="tel" id="userPhone" placeholder="Phone Number" maxlength="10">
+  <button onclick="userLogin()">Login</button>
+  <button class="back-btn" onclick="goBack()">Back</button>
+</div>
+
+<!-- User Menu -->
+<div class="container" id="userMenu" style="display:none;">
+  <h2>Food Menu</h2>
+  <div id="menuList"></div>
+  <button class="back-btn" onclick="logout()">Logout</button>
 </div>
 
 <!-- Admin Login -->
 <div class="container" id="adminLogin" style="display:none;">
   <h2>Admin Login</h2>
-  <div class="input-group">
-    <label>Username</label>
-    <input type="text" id="adminUser" placeholder="Enter admin username">
-  </div>
-  <div class="input-group">
-    <label>Password</label>
-    <input type="password" id="adminPass" placeholder="Enter password">
-  </div>
-  <button id="adminLoginBtn">Login</button>
-  <p class="error-msg" id="adminError"></p>
+  <input type="password" id="adminPass" placeholder="Enter Password">
+  <button onclick="adminLogin()">Login</button>
+  <button onclick="showForgotPassword()">Forgot Password?</button>
+  <button class="back-btn" onclick="goBack()">Back</button>
 </div>
 
-<!-- Admin Dashboard -->
-<div class="container" id="adminDashboard">
-  <h2>Admin Dashboard</h2>
-  <h3>Add Food Item</h3>
-  <div class="input-group">
-    <label>Food Name</label>
-    <input type="text" id="foodName" placeholder="Enter food name">
-  </div>
-  <div class="input-group">
-    <label>Category</label>
-    <input type="text" id="foodType" placeholder="veg / nonveg / drinks">
-  </div>
-  <div class="input-group">
-    <label>Image URL</label>
-    <input type="text" id="foodImg" placeholder="Enter image URL">
-  </div>
-  <div class="input-group">
-    <label>Price (₹)</label>
-    <input type="number" id="foodPrice" placeholder="Enter price">
-  </div>
-  <button id="addFoodBtn">Add Food</button>
+<!-- Admin Panel -->
+<div class="container" id="adminPanel" style="display:none;">
+  <h2>Admin Panel</h2>
+  <input type="text" id="foodItem" placeholder="Add Food Item">
+  <button onclick="addFood()">Add Food</button>
+  <div id="menuListAdmin"></div>
+  <h3>Registered Users</h3>
+  <div id="userList"></div>
+  <button onclick="showChangePassword()">Change Password</button>
+  <button class="back-btn" onclick="logout()">Logout</button>
+</div>
 
-  <h3 style="margin-top:20px;">Current Menu</h3>
-  <div id="foodList"></div>
+<!-- Change Password -->
+<div class="container" id="changePasswordBox" style="display:none;">
+  <h2>Change Password</h2>
+  <input type="password" id="oldPass" placeholder="Old Password">
+  <input type="password" id="newPass" placeholder="New Password">
+  <button onclick="changePassword()">Update Password</button>
+  <button class="back-btn" onclick="showAdminPanel()">Back</button>
+</div>
 
-  <h3 style="margin-top:20px;">Registered Customers</h3>
-  <table>
-    <thead><tr><th>Name</th><th>Phone</th></tr></thead>
-    <tbody id="customerList"></tbody>
-  </table>
-
-  <button style="margin-top:15px;" onclick="logout()">Logout</button>
+<!-- Forgot Password -->
+<div class="container" id="forgotPasswordBox" style="display:none;">
+  <h2>Reset Admin Password</h2>
+  <p>Enter secret key: <strong>foodadmin123</strong></p>
+  <input type="password" id="secretKey" placeholder="Enter Secret Key">
+  <input type="password" id="resetPass" placeholder="New Password">
+  <button onclick="resetPassword()">Reset Password</button>
+  <button class="back-btn" onclick="showAdminLogin()">Back</button>
 </div>
 
 <script>
-let customers = JSON.parse(localStorage.getItem('customers')) || [];
-let menu = JSON.parse(localStorage.getItem('menu')) || [
-  {name:'Veg Biryani', type:'veg', img:'https://cdn.pixabay.com/photo/2017/12/09/08/18/biryani-3009795_1280.jpg', price:120},
-  {name:'Chicken Wings', type:'nonveg', img:'https://cdn.pixabay.com/photo/2018/08/31/12/24/chicken-wings-3641953_1280.jpg', price:150},
-  {name:'Cold Coffee', type:'drinks', img:'https://cdn.pixabay.com/photo/2017/07/16/10/43/coffee-2503489_1280.jpg', price:60}
-];
-const admin = {username:'admin', password:'1234'};
+let adminPassword = localStorage.getItem('adminPassword') || 'admin123';
 
-// LOGIN CHOICES
-document.getElementById('customerBtn').onclick = ()=>{
-  document.getElementById('loginTypeBox').style.display='none';
-  document.getElementById('customerLogin').style.display='block';
-};
-document.getElementById('adminBtn').onclick = ()=>{
-  document.getElementById('loginTypeBox').style.display='none';
-  document.getElementById('adminLogin').style.display='block';
-};
-
-// CUSTOMER LOGIN
-document.getElementById('loginBtn').onclick = ()=>{
-  const name = document.getElementById('fullname').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const msg = document.getElementById('errorMsg');
-
-  if(!name || !phone){
-    msg.textContent='Please fill all fields';
-    return;
+// User login/signup
+function showUserLogin() {
+  hideAll();
+  document.getElementById('userLogin').style.display = 'block';
+}
+function userLogin() {
+  const name = document.getElementById('userName').value.trim();
+  const phone = document.getElementById('userPhone').value.trim();
+  if (!name || !phone) return alert('Please fill all fields');
+  
+  let users = JSON.parse(localStorage.getItem('users') || '[]');
+  if (!users.some(u => u.phone === phone)) {
+    users.push({ name, phone });
+    localStorage.setItem('users', JSON.stringify(users));
   }
+  showUserMenu();
+}
 
-  let existing = customers.find(u=>u.phone===phone);
-  if(!existing){
-    customers.push({name,phone});
-    localStorage.setItem('customers', JSON.stringify(customers));
-  }
-  msg.textContent='';
-  document.getElementById('customerLogin').style.display='none';
-  document.getElementById('menuPage').style.display='block';
-  renderMenu();
-};
+// Admin login
+function showAdminLogin() {
+  hideAll();
+  document.getElementById('adminLogin').style.display = 'block';
+}
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === adminPassword) showAdminPanel();
+  else alert('Incorrect password');
+}
 
-// ADMIN LOGIN
-document.getElementById('adminLoginBtn').onclick = ()=>{
-  const user = document.getElementById('adminUser').value.trim();
-  const pass = document.getElementById('adminPass').value.trim();
-  const msg = document.getElementById('adminError');
-
-  if(user===admin.username && pass===admin.password){
-    msg.textContent='';
-    document.getElementById('adminLogin').style.display='none';
-    document.getElementById('adminDashboard').style.display='block';
-    renderAdminMenu();
-    renderCustomerList();
+// Forgot password
+function showForgotPassword() {
+  hideAll();
+  document.getElementById('forgotPasswordBox').style.display = 'block';
+}
+function resetPassword() {
+  const key = document.getElementById('secretKey').value.trim();
+  const newPass = document.getElementById('resetPass').value.trim();
+  if (key === 'foodadmin123' && newPass) {
+    localStorage.setItem('adminPassword', newPass);
+    adminPassword = newPass;
+    alert('Password reset successful!');
+    showAdminLogin();
   } else {
-    msg.textContent='Invalid credentials';
-  }
-};
-
-// ADD FOOD
-document.getElementById('addFoodBtn').onclick = ()=>{
-  const name=document.getElementById('foodName').value.trim();
-  const type=document.getElementById('foodType').value.trim().toLowerCase();
-  const img=document.getElementById('foodImg').value.trim();
-  const price=document.getElementById('foodPrice').value.trim();
-  if(!name||!type||!img||!price){alert('Please fill all fields');return;}
-  menu.push({name,type,img,price});
-  localStorage.setItem('menu',JSON.stringify(menu));
-  renderAdminMenu();
-  document.getElementById('foodName').value='';
-  document.getElementById('foodType').value='';
-  document.getElementById('foodImg').value='';
-  document.getElementById('foodPrice').value='';
-};
-
-// RENDER MENU FOR CUSTOMER
-function renderMenu(){
-  const menuItems=document.getElementById('menuItems');
-  menuItems.innerHTML='';
-  menu.forEach(item=>{
-    const card=document.createElement('div');
-    card.className='card';
-    card.innerHTML=`<img src="${item.img}" alt="${item.name}">
-                    <h4>${item.name}</h4>
-                    <p>${item.type.toUpperCase()} - ₹${item.price}</p>`;
-    menuItems.appendChild(card);
-  });
-}
-
-// RENDER MENU FOR ADMIN
-function renderAdminMenu(){
-  const list=document.getElementById('foodList');
-  list.innerHTML='';
-  if(menu.length===0){
-    list.innerHTML='<p>No food items yet.</p>';
-  }else{
-    menu.forEach((item,i)=>{
-      const div=document.createElement('div');
-      div.className='card';
-      div.innerHTML=`<img src="${item.img}">
-                     <h4>${item.name}</h4>
-                     <p>${item.type.toUpperCase()} - ₹${item.price}</p>
-                     <button class='small-btn' onclick='removeFood(${i})'>Remove</button>`;
-      list.appendChild(div);
-    });
+    alert('Invalid secret key or empty password');
   }
 }
 
-function removeFood(index){
-  menu.splice(index,1);
-  localStorage.setItem('menu',JSON.stringify(menu));
-  renderAdminMenu();
+// Admin Panel
+function showAdminPanel() {
+  hideAll();
+  document.getElementById('adminPanel').style.display = 'block';
+  renderMenuAdmin();
+  renderUsers();
+}
+function addFood() {
+  const item = document.getElementById('foodItem').value.trim();
+  if (!item) return alert('Enter food name');
+  let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+  foods.push(item);
+  localStorage.setItem('foods', JSON.stringify(foods));
+  renderMenuAdmin();
+  document.getElementById('foodItem').value = '';
+}
+function removeFood(i) {
+  let foods = JSON.parse(localStorage.getItem('foods') || '[]');
+  foods.splice(i, 1);
+  localStorage.setItem('foods', JSON.stringify(foods));
+  renderMenuAdmin();
+}
+function renderMenuAdmin() {
+  const list = document.getElementById('menuListAdmin');
+  const foods = JSON.parse(localStorage.getItem('foods') || '[]');
+  list.innerHTML = foods.map((f, i) =>
+    `<div>${f} <button onclick="removeFood(${i})">Remove</button></div>`
+  ).join('');
+}
+function renderUsers() {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const list = document.getElementById('userList');
+  list.innerHTML = users.map(u => `<div>${u.name} - ${u.phone}</div>`).join('');
 }
 
-// SHOW REGISTERED CUSTOMERS
-function renderCustomerList(){
-  const list=document.getElementById('customerList');
-  list.innerHTML='';
-  if(customers.length===0){
-    list.innerHTML='<tr><td colspan="2">No customers yet</td></tr>';
+// Change Password
+function showChangePassword() {
+  hideAll();
+  document.getElementById('changePasswordBox').style.display = 'block';
+}
+function changePassword() {
+  const oldPass = document.getElementById('oldPass').value;
+  const newPass = document.getElementById('newPass').value;
+  if (oldPass === adminPassword && newPass) {
+    localStorage.setItem('adminPassword', newPass);
+    adminPassword = newPass;
+    alert('Password updated successfully!');
+    showAdminPanel();
   } else {
-    customers.forEach(c=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${c.name}</td><td>${c.phone}</td>`;
-      list.appendChild(tr);
-    });
+    alert('Incorrect old password or empty new password');
   }
 }
 
-// LOGOUT
-function logout(){
-  document.getElementById('loginTypeBox').style.display='block';
-  document.getElementById('customerLogin').style.display='none';
-  document.getElementById('menuPage').style.display='none';
-  document.getElementById('adminLogin').style.display='none';
-  document.getElementById('adminDashboard').style.display='none';
+// User Menu
+function showUserMenu() {
+  hideAll();
+  document.getElementById('userMenu').style.display = 'block';
+  const foods = JSON.parse(localStorage.getItem('foods') || '[]');
+  document.getElementById('menuList').innerHTML =
+    foods.length ? foods.map(f => `<div>${f}</div>`).join('') : '<p>No food available</p>';
+}
+
+// Back, Logout, Helpers
+function hideAll() {
+  document.querySelectorAll('.container').forEach(el => el.style.display = 'none');
+}
+function goBack() {
+  hideAll();
+  document.getElementById('mainPage').style.display = 'block';
+}
+function logout() {
+  goBack();
 }
 </script>
+
 </body>
 </html>
