@@ -3,89 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Food Menu OTP Login</title>
+<title>Digital Food Menu</title>
 <style>
-  body { font-family: Arial,sans-serif; background:#222; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh;}
-  .container { background:rgba(0,0,0,0.7); padding:30px; border-radius:15px; width:350px; text-align:center;}
-  input, button { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none;}
-  button { background:#00eaff; color:#000; cursor:pointer; font-weight:600;}
+  body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    width: 350px;
+    text-align: center;
+  }
+  input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: none;
+  }
+  button {
+    background: #00eaff;
+    color: #000;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  #menu, #adminPanel {
+    display: none;
+    margin-top: 20px;
+  }
+  .food-item {
+    background: #333;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 10px;
+  }
+  .admin-controls input {
+    width: 48%;
+    margin-right: 2%;
+  }
+  .admin-controls button {
+    width: 100%;
+    background: #00eaff;
+    color: #000;
+    margin-top: 5px;
+  }
+  #backBtn {
+    margin-top: 15px;
+    background: #ff4444;
+    color: white;
+  }
 </style>
 </head>
 <body>
 
 <div class="container" id="loginBox">
-  <h2>Login / Signup</h2>
-  <div class="input-group">
-    <label>Full Name</label>
-    <input type="text" id="fullname" placeholder="Enter your name">
-  </div>
-  <div class="input-group">
-    <label>Phone Number</label>
-    <input type="tel" id="phone" placeholder="Enter your phone" maxlength="10">
-  </div>
-  <div class="input-group" id="otpField" style="display:none;">
-    <label>Enter OTP</label>
-    <input type="text" id="otpInput" placeholder="Enter OTP">
-  </div>
-  <button id="sendOTPBtn">Send OTP</button>
-  <button id="verifyOTPBtn" style="display:none;">Verify OTP</button>
+  <h2>🍔 Digital Food Menu</h2>
+  <h4>Login / Signup</h4>
+  <input type="text" id="fullname" placeholder="Enter your name">
+  <input type="tel" id="phone" placeholder="Enter your phone" maxlength="10">
+  <button id="loginBtn">Login</button>
+  <hr>
+  <button id="adminLoginBtn">Admin Login</button>
   <p id="statusMsg"></p>
 </div>
 
-<script>
-let generatedOTP = null;
+<div id="menu" class="container">
+  <h2>Welcome, <span id="userName"></span></h2>
+  <h3>🍴 Food Menu</h3>
+  <div id="menuList"></div>
+  <button id="backBtn">Logout</button>
+</div>
 
-// Send OTP
-document.getElementById('sendOTPBtn').addEventListener('click', async () => {
-  const fullname = document.getElementById('fullname').value.trim();
+<div id="adminPanel" class="container">
+  <h2>👨‍🍳 Admin Panel</h2>
+  <div id="adminLogin">
+    <input type="text" id="adminUser" placeholder="Username">
+    <input type="password" id="adminPass" placeholder="Password">
+    <button id="adminSubmit">Login as Admin</button>
+  </div>
+
+  <div id="adminDashboard" style="display:none;">
+    <h3>Menu Management</h3>
+    <div class="admin-controls">
+      <input type="text" id="foodName" placeholder="Food Name">
+      <input type="number" id="foodPrice" placeholder="Price">
+      <button id="addFoodBtn">Add Food</button>
+    </div>
+    <div id="foodList"></div>
+
+    <h3>Registered Users</h3>
+    <div id="userList"></div>
+
+    <button id="logoutAdmin">Logout</button>
+  </div>
+</div>
+
+<script>
+// ---------------- USER LOGIN ----------------
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const name = document.getElementById('fullname').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const statusMsg = document.getElementById('statusMsg');
 
-  if (!fullname || !phone) {
-    statusMsg.textContent = "Please fill all fields";
+  if (!name || !phone) {
+    statusMsg.textContent = "Please enter all fields!";
     statusMsg.style.color = 'red';
     return;
   }
 
-  generatedOTP = Math.floor(100000 + Math.random()*900000).toString();
-
-  try {
-    const res = await fetch('/.netlify/functions/send-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phone, otp: generatedOTP })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      statusMsg.textContent = "✅ OTP sent to your phone.";
-      statusMsg.style.color = 'green';
-      document.getElementById('otpField').style.display = 'block';
-      document.getElementById('sendOTPBtn').style.display = 'none';
-      document.getElementById('verifyOTPBtn').style.display = 'block';
-    } else {
-      statusMsg.textContent = "❌ Failed to send OTP: " + data.error;
-      statusMsg.style.color = 'red';
-    }
-  } catch (err) {
-    statusMsg.textContent = "❌ Error: " + err.message;
-    statusMsg.style.color = 'red';
+  // Save user
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  const exists = users.find(u => u.phone === phone);
+  if (!exists) {
+    users.push({ name, phone });
+    localStorage.setItem('users', JSON.stringify(users));
   }
+
+  // Show menu
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('menu').style.display = 'block';
+  document.getElementById('userName').textContent = name;
+  loadMenu();
 });
 
-// Verify OTP
-document.getElementById('verifyOTPBtn').addEventListener('click', () => {
-  const enteredOTP = document.getElementById('otpInput').value.trim();
-  const statusMsg = document.getElementById('statusMsg');
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('menu').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'block';
+});
 
-  if (enteredOTP === generatedOTP) {
-    statusMsg.textContent = "✅ OTP verified! Welcome!";
-    statusMsg.style.color = 'green';
-    document.getElementById('verifyOTPBtn').style.display = 'none';
+// ---------------- MENU DISPLAY ----------------
+function loadMenu() {
+  const menu = JSON.parse(localStorage.getItem('menu')) || [
+    { name: "Veg Burger", price: 80 },
+    { name: "Paneer Pizza", price: 120 },
+    { name: "Cold Coffee", price: 60 }
+  ];
+  const list = document.getElementById('menuList');
+  list.innerHTML = "";
+  menu.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'food-item';
+    div.textContent = `${item.name} - ₹${item.price}`;
+    list.appendChild(div);
+  });
+}
+
+// ---------------- ADMIN LOGIN ----------------
+document.getElementById('adminLoginBtn').addEventListener('click', () => {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+});
+
+document.getElementById('adminSubmit').addEventListener('click', () => {
+  const user = document.getElementById('adminUser').value;
+  const pass = document.getElementById('adminPass').value;
+
+  if (user === "admin" && pass === "1234") {
+    document.getElementById('adminLogin').style.display = 'none';
+    document.getElementById('adminDashboard').style.display = 'block';
+    loadAdminMenu();
+    loadUserList();
   } else {
-    statusMsg.textContent = "❌ Incorrect OTP. Try again.";
-    statusMsg.style.color = 'red';
+    alert("Invalid admin credentials!");
   }
 });
+
+document.getElementById('logoutAdmin').addEventListener('click', () => {
+  document.getElementById('adminDashboard').style.display = 'none';
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginBox').style.display = 'block';
+});
+
+// ---------------- ADMIN MENU MANAGEMENT ----------------
+function loadAdminMenu() {
+  const menu = JSON.parse(localStorage.getItem('menu')) || [];
+  const foodList = document.getElementById('foodList');
+  foodList.innerHTML = "";
+
+  if (menu.length === 0) {
+    foodList.innerHTML = "<p>No food items available.</p>";
+  } else {
+    menu.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'food-item';
+      div.innerHTML = `${item.name} - ₹${item.price} <br><button onclick="removeFood(${index})">Remove</button>`;
+      foodList.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('addFoodBtn').addEventListener('click', () => {
+  const name = document.getElementById('foodName').value.trim();
+  const price = document.getElementById('foodPrice').value.trim();
+  if (!name || !price) {
+    alert("Enter both name and price!");
+    return;
+  }
+  let menu = JSON.parse(localStorage.getItem('menu')) || [];
+  menu.push({ name, price });
+  localStorage.setItem('menu', JSON.stringify(menu));
+  loadAdminMenu();
+  document.getElementById('foodName').value = "";
+  document.getElementById('foodPrice').value = "";
+});
+
+function removeFood(index) {
+  let menu = JSON.parse(localStorage.getItem('menu')) || [];
+  menu.splice(index, 1);
+  localStorage.setItem('menu', JSON.stringify(menu));
+  loadAdminMenu();
+}
+
+// ---------------- VIEW REGISTERED USERS ----------------
+function loadUserList() {
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const userList = document.getElementById('userList');
+  userList.innerHTML = "";
+
+  if (users.length === 0) {
+    userList.innerHTML = "<p>No registered users yet.</p>";
+  } else {
+    users.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'food-item';
+      div.textContent = `${u.name} - ${u.phone}`;
+      userList.appendChild(div);
+    });
+  }
+}
 </script>
 
 </body>
