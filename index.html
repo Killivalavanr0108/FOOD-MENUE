@@ -3,245 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Food Menu</title>
+<title>Digital Food Menu System</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #222;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-  }
-  .container {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 30px;
-    border-radius: 15px;
-    width: 350px;
-    text-align: center;
-  }
-  input, button {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: none;
-  }
-  button {
-    background: #00eaff;
-    color: #000;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  #menu, #adminPanel {
-    display: none;
-    margin-top: 20px;
-  }
-  .food-item {
-    background: #333;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 10px;
-  }
-  .admin-controls input {
-    width: 48%;
-    margin-right: 2%;
-  }
-  .admin-controls button {
-    width: 100%;
-    background: #00eaff;
-    color: #000;
-    margin-top: 5px;
-  }
-  #backBtn {
-    margin-top: 15px;
-    background: #ff4444;
-    color: white;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{
+  min-height:100vh;
+  background:#111 url('https://cdn.pixabay.com/photo/2016/03/05/19/02/fish-1238395_1280.jpg') center/cover no-repeat;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  position:relative;
+}
+body::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(4px);
+  z-index:0;
+}
+.container{
+  width:400px;
+  background:rgba(255,255,255,0.08);
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 0 20px rgba(0,255,255,0.3);
+  backdrop-filter:blur(10px);
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+h2{margin-bottom:20px;color:#00eaff;}
+.input-group{margin:15px 0;text-align:left;}
+.input-group label{display:block;margin-bottom:6px;font-weight:600;}
+.input-group input{
+  width:100%;padding:10px;border:none;
+  border-radius:8px;background:rgba(255,255,255,0.1);
+  color:#fff;outline:none;}
+button{
+  width:100%;padding:10px;background:#00eaff;
+  border:none;border-radius:8px;font-weight:600;
+  cursor:pointer;transition:0.3s;}
+button:hover{background:#00cce7;}
+.error-msg{margin-top:10px;font-size:14px;color:red;}
+#menuPage,#adminDashboard{display:none;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid rgba(255,255,255,0.2);padding:8px;text-align:left;}
+th{background:rgba(0,0,0,0.4);}
+.menu-container{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;
+}
+.card{
+  background:rgba(255,255,255,0.1);
+  padding:10px;
+  border-radius:15px;
+  box-shadow:0 0 15px rgba(0,255,255,0.3);
+  text-align:center;
+}
+.card img{
+  width:100%;
+  height:100px;
+  object-fit:cover;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+.card h4{color:#00eaff;margin-bottom:5px;}
+.card p{font-size:13px;color:#fff;}
+.small-btn{
+  padding:5px 10px;
+  font-size:12px;
+  margin-top:5px;
+  background:#ff4444;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+}
+.small-btn:hover{background:#ff6666;}
 </style>
 </head>
 <body>
 
-<div class="container" id="loginBox">
-  <h2>🍔 Digital Food Menu</h2>
-  <h4>Login / Signup</h4>
-  <input type="text" id="fullname" placeholder="Enter your name">
-  <input type="tel" id="phone" placeholder="Enter your phone" maxlength="10">
-  <button id="loginBtn">Login</button>
-  <hr>
-  <button id="adminLoginBtn">Admin Login</button>
-  <p id="statusMsg"></p>
+<!-- Choose Login Type -->
+<div class="container" id="loginTypeBox">
+  <h2>Login As</h2>
+  <button id="customerBtn">Customer</button>
+  <button id="adminBtn" style="margin-top:10px;">Admin</button>
 </div>
 
-<div id="menu" class="container">
-  <h2>Welcome, <span id="userName"></span></h2>
-  <h3>🍴 Food Menu</h3>
-  <div id="menuList"></div>
-  <button id="backBtn">Logout</button>
+<!-- Customer Login / Register -->
+<div class="container" id="customerLogin" style="display:none;">
+  <h2 id="formTitle">Customer Login</h2>
+  <div class="input-group">
+    <label>Full Name</label>
+    <input type="text" id="fullname" placeholder="Enter your name">
+  </div>
+  <div class="input-group">
+    <label>Phone Number</label>
+    <input type="tel" id="phone" placeholder="Enter your phone" maxlength="10">
+  </div>
+  <button id="loginBtn">Login / Register</button>
+  <p class="error-msg" id="errorMsg"></p>
 </div>
 
-<div id="adminPanel" class="container">
-  <h2>👨‍🍳 Admin Panel</h2>
-  <div id="adminLogin">
-    <input type="text" id="adminUser" placeholder="Username">
-    <input type="password" id="adminPass" placeholder="Password">
-    <button id="adminSubmit">Login as Admin</button>
+<!-- Customer Menu Page -->
+<div class="container" id="menuPage">
+  <h2>Digital Food Menu</h2>
+  <div class="menu-container" id="menuItems"></div>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<!-- Admin Login -->
+<div class="container" id="adminLogin" style="display:none;">
+  <h2>Admin Login</h2>
+  <div class="input-group">
+    <label>Username</label>
+    <input type="text" id="adminUser" placeholder="Enter admin username">
   </div>
-
-  <div id="adminDashboard" style="display:none;">
-    <h3>Menu Management</h3>
-    <div class="admin-controls">
-      <input type="text" id="foodName" placeholder="Food Name">
-      <input type="number" id="foodPrice" placeholder="Price">
-      <button id="addFoodBtn">Add Food</button>
-    </div>
-    <div id="foodList"></div>
-
-    <h3>Registered Users</h3>
-    <div id="userList"></div>
-
-    <button id="logoutAdmin">Logout</button>
+  <div class="input-group">
+    <label>Password</label>
+    <input type="password" id="adminPass" placeholder="Enter password">
   </div>
+  <button id="adminLoginBtn">Login</button>
+  <p class="error-msg" id="adminError"></p>
+</div>
+
+<!-- Admin Dashboard -->
+<div class="container" id="adminDashboard">
+  <h2>Admin Dashboard</h2>
+  <h3>Add Food Item</h3>
+  <div class="input-group">
+    <label>Food Name</label>
+    <input type="text" id="foodName" placeholder="Enter food name">
+  </div>
+  <div class="input-group">
+    <label>Category</label>
+    <input type="text" id="foodType" placeholder="veg / nonveg / drinks">
+  </div>
+  <div class="input-group">
+    <label>Image URL</label>
+    <input type="text" id="foodImg" placeholder="Enter image URL">
+  </div>
+  <div class="input-group">
+    <label>Price (₹)</label>
+    <input type="number" id="foodPrice" placeholder="Enter price">
+  </div>
+  <button id="addFoodBtn">Add Food</button>
+
+  <h3 style="margin-top:20px;">Current Menu</h3>
+  <div id="foodList"></div>
+
+  <h3 style="margin-top:20px;">Registered Customers</h3>
+  <table>
+    <thead><tr><th>Name</th><th>Phone</th></tr></thead>
+    <tbody id="customerList"></tbody>
+  </table>
+
+  <button style="margin-top:15px;" onclick="logout()">Logout</button>
 </div>
 
 <script>
-// ---------------- USER LOGIN ----------------
-document.getElementById('loginBtn').addEventListener('click', () => {
+let customers = JSON.parse(localStorage.getItem('customers')) || [];
+let menu = JSON.parse(localStorage.getItem('menu')) || [
+  {name:'Veg Biryani', type:'veg', img:'https://cdn.pixabay.com/photo/2017/12/09/08/18/biryani-3009795_1280.jpg', price:120},
+  {name:'Chicken Wings', type:'nonveg', img:'https://cdn.pixabay.com/photo/2018/08/31/12/24/chicken-wings-3641953_1280.jpg', price:150},
+  {name:'Cold Coffee', type:'drinks', img:'https://cdn.pixabay.com/photo/2017/07/16/10/43/coffee-2503489_1280.jpg', price:60}
+];
+const admin = {username:'admin', password:'1234'};
+
+// LOGIN CHOICES
+document.getElementById('customerBtn').onclick = ()=>{
+  document.getElementById('loginTypeBox').style.display='none';
+  document.getElementById('customerLogin').style.display='block';
+};
+document.getElementById('adminBtn').onclick = ()=>{
+  document.getElementById('loginTypeBox').style.display='none';
+  document.getElementById('adminLogin').style.display='block';
+};
+
+// CUSTOMER LOGIN
+document.getElementById('loginBtn').onclick = ()=>{
   const name = document.getElementById('fullname').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  const statusMsg = document.getElementById('statusMsg');
+  const msg = document.getElementById('errorMsg');
 
-  if (!name || !phone) {
-    statusMsg.textContent = "Please enter all fields!";
-    statusMsg.style.color = 'red';
+  if(!name || !phone){
+    msg.textContent='Please fill all fields';
     return;
   }
 
-  // Save user
-  let users = JSON.parse(localStorage.getItem('users')) || [];
-  const exists = users.find(u => u.phone === phone);
-  if (!exists) {
-    users.push({ name, phone });
-    localStorage.setItem('users', JSON.stringify(users));
+  let existing = customers.find(u=>u.phone===phone);
+  if(!existing){
+    customers.push({name,phone});
+    localStorage.setItem('customers', JSON.stringify(customers));
   }
+  msg.textContent='';
+  document.getElementById('customerLogin').style.display='none';
+  document.getElementById('menuPage').style.display='block';
+  renderMenu();
+};
 
-  // Show menu
-  document.getElementById('loginBox').style.display = 'none';
-  document.getElementById('menu').style.display = 'block';
-  document.getElementById('userName').textContent = name;
-  loadMenu();
-});
+// ADMIN LOGIN
+document.getElementById('adminLoginBtn').onclick = ()=>{
+  const user = document.getElementById('adminUser').value.trim();
+  const pass = document.getElementById('adminPass').value.trim();
+  const msg = document.getElementById('adminError');
 
-document.getElementById('backBtn').addEventListener('click', () => {
-  document.getElementById('menu').style.display = 'none';
-  document.getElementById('loginBox').style.display = 'block';
-});
+  if(user===admin.username && pass===admin.password){
+    msg.textContent='';
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminDashboard').style.display='block';
+    renderAdminMenu();
+    renderCustomerList();
+  } else {
+    msg.textContent='Invalid credentials';
+  }
+};
 
-// ---------------- MENU DISPLAY ----------------
-function loadMenu() {
-  const menu = JSON.parse(localStorage.getItem('menu')) || [
-    { name: "Veg Burger", price: 80 },
-    { name: "Paneer Pizza", price: 120 },
-    { name: "Cold Coffee", price: 60 }
-  ];
-  const list = document.getElementById('menuList');
-  list.innerHTML = "";
-  menu.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'food-item';
-    div.textContent = `${item.name} - ₹${item.price}`;
-    list.appendChild(div);
+// ADD FOOD
+document.getElementById('addFoodBtn').onclick = ()=>{
+  const name=document.getElementById('foodName').value.trim();
+  const type=document.getElementById('foodType').value.trim().toLowerCase();
+  const img=document.getElementById('foodImg').value.trim();
+  const price=document.getElementById('foodPrice').value.trim();
+  if(!name||!type||!img||!price){alert('Please fill all fields');return;}
+  menu.push({name,type,img,price});
+  localStorage.setItem('menu',JSON.stringify(menu));
+  renderAdminMenu();
+  document.getElementById('foodName').value='';
+  document.getElementById('foodType').value='';
+  document.getElementById('foodImg').value='';
+  document.getElementById('foodPrice').value='';
+};
+
+// RENDER MENU FOR CUSTOMER
+function renderMenu(){
+  const menuItems=document.getElementById('menuItems');
+  menuItems.innerHTML='';
+  menu.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<img src="${item.img}" alt="${item.name}">
+                    <h4>${item.name}</h4>
+                    <p>${item.type.toUpperCase()} - ₹${item.price}</p>`;
+    menuItems.appendChild(card);
   });
 }
 
-// ---------------- ADMIN LOGIN ----------------
-document.getElementById('adminLoginBtn').addEventListener('click', () => {
-  document.getElementById('loginBox').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'block';
-});
-
-document.getElementById('adminSubmit').addEventListener('click', () => {
-  const user = document.getElementById('adminUser').value;
-  const pass = document.getElementById('adminPass').value;
-
-  if (user === "admin" && pass === "1234") {
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminDashboard').style.display = 'block';
-    loadAdminMenu();
-    loadUserList();
-  } else {
-    alert("Invalid admin credentials!");
-  }
-});
-
-document.getElementById('logoutAdmin').addEventListener('click', () => {
-  document.getElementById('adminDashboard').style.display = 'none';
-  document.getElementById('adminLogin').style.display = 'block';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('loginBox').style.display = 'block';
-});
-
-// ---------------- ADMIN MENU MANAGEMENT ----------------
-function loadAdminMenu() {
-  const menu = JSON.parse(localStorage.getItem('menu')) || [];
-  const foodList = document.getElementById('foodList');
-  foodList.innerHTML = "";
-
-  if (menu.length === 0) {
-    foodList.innerHTML = "<p>No food items available.</p>";
-  } else {
-    menu.forEach((item, index) => {
-      const div = document.createElement('div');
-      div.className = 'food-item';
-      div.innerHTML = `${item.name} - ₹${item.price} <br><button onclick="removeFood(${index})">Remove</button>`;
-      foodList.appendChild(div);
+// RENDER MENU FOR ADMIN
+function renderAdminMenu(){
+  const list=document.getElementById('foodList');
+  list.innerHTML='';
+  if(menu.length===0){
+    list.innerHTML='<p>No food items yet.</p>';
+  }else{
+    menu.forEach((item,i)=>{
+      const div=document.createElement('div');
+      div.className='card';
+      div.innerHTML=`<img src="${item.img}">
+                     <h4>${item.name}</h4>
+                     <p>${item.type.toUpperCase()} - ₹${item.price}</p>
+                     <button class='small-btn' onclick='removeFood(${i})'>Remove</button>`;
+      list.appendChild(div);
     });
   }
 }
 
-document.getElementById('addFoodBtn').addEventListener('click', () => {
-  const name = document.getElementById('foodName').value.trim();
-  const price = document.getElementById('foodPrice').value.trim();
-  if (!name || !price) {
-    alert("Enter both name and price!");
-    return;
-  }
-  let menu = JSON.parse(localStorage.getItem('menu')) || [];
-  menu.push({ name, price });
-  localStorage.setItem('menu', JSON.stringify(menu));
-  loadAdminMenu();
-  document.getElementById('foodName').value = "";
-  document.getElementById('foodPrice').value = "";
-});
-
-function removeFood(index) {
-  let menu = JSON.parse(localStorage.getItem('menu')) || [];
-  menu.splice(index, 1);
-  localStorage.setItem('menu', JSON.stringify(menu));
-  loadAdminMenu();
+function removeFood(index){
+  menu.splice(index,1);
+  localStorage.setItem('menu',JSON.stringify(menu));
+  renderAdminMenu();
 }
 
-// ---------------- VIEW REGISTERED USERS ----------------
-function loadUserList() {
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  const userList = document.getElementById('userList');
-  userList.innerHTML = "";
-
-  if (users.length === 0) {
-    userList.innerHTML = "<p>No registered users yet.</p>";
+// SHOW REGISTERED CUSTOMERS
+function renderCustomerList(){
+  const list=document.getElementById('customerList');
+  list.innerHTML='';
+  if(customers.length===0){
+    list.innerHTML='<tr><td colspan="2">No customers yet</td></tr>';
   } else {
-    users.forEach(u => {
-      const div = document.createElement('div');
-      div.className = 'food-item';
-      div.textContent = `${u.name} - ${u.phone}`;
-      userList.appendChild(div);
+    customers.forEach(c=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${c.name}</td><td>${c.phone}</td>`;
+      list.appendChild(tr);
     });
   }
+}
+
+// LOGOUT
+function logout(){
+  document.getElementById('loginTypeBox').style.display='block';
+  document.getElementById('customerLogin').style.display='none';
+  document.getElementById('menuPage').style.display='none';
+  document.getElementById('adminLogin').style.display='none';
+  document.getElementById('adminDashboard').style.display='none';
 }
 </script>
-
 </body>
 </html>
