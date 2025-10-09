@@ -5,234 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Food Menu System</title>
 <style>
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Poppins, sans-serif;
-    background: linear-gradient(135deg, #141e30, #243b55);
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .container {
-    width: 90%;
-    max-width: 400px;
-    background: rgba(0,0,0,0.7);
-    padding: 30px;
-    border-radius: 15px;
-    margin-top: 50px;
-    text-align: center;
-  }
-  input, button {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-  }
-  input { background: #fff; color: #000; }
-  button { background: #00eaff; color: #000; font-weight: 600; cursor: pointer; }
-  h2 { margin-bottom: 15px; }
-  #menuList div {
-    background: rgba(255,255,255,0.1);
-    padding: 10px;
-    border-radius: 8px;
-    margin: 5px 0;
-  }
-  .back-btn {
-    background: #ff0066;
-    color: #fff;
-  }
+* { box-sizing: border-box; font-family: Poppins, sans-serif; }
+body, html { margin:0; padding:0; height:100%; width:100%; background: linear-gradient(135deg,#141e30,#243b55); color:#fff; display:flex; justify-content:center; align-items:flex-start; overflow:auto;}
+.container { width: 90%; max-width: 450px; padding: 25px; border-radius:15px; background:rgba(0,0,0,0.7); text-align:center; margin:20px auto; position:relative;}
+input, button { width:100%; padding:10px; margin:8px 0; border:none; border-radius:8px; }
+input { background:#fff; color:#000; }
+button { background:#00eaff; color:#000; font-weight:600; cursor:pointer; transition:0.3s; }
+button:hover { background:#00bcd4; }
+h2{margin-bottom:15px;}
+.back-btn{background:#ff0066;color:#fff;margin-top:5px;}
+.menu-container{margin-top:15px;}
+.menu-container div{background: rgba(255,255,255,0.1); padding:10px; border-radius:8px; margin:5px 0;}
+.menu-container img{width:100%; height:100px; object-fit:cover; border-radius:5px; margin-bottom:5px;}
 </style>
 </head>
 <body>
 
+<!-- Main Page -->
 <div class="container" id="mainPage">
   <h2>Digital Food Menu</h2>
-  <button onclick="showUserLogin()">User Login / Signup</button>
+  <button onclick="showUserLogin()">Customer Login / Signup</button>
   <button onclick="showAdminLogin()">Admin Login</button>
 </div>
 
-<!-- User Login -->
+<!-- Customer Login -->
 <div class="container" id="userLogin" style="display:none;">
-  <h2>User Login / Signup</h2>
+  <button class="back-btn" onclick="goBack()">← Back</button>
+  <h2>Customer Login / Signup</h2>
   <input type="text" id="userName" placeholder="Full Name">
   <input type="tel" id="userPhone" placeholder="Phone Number" maxlength="10">
-  <button onclick="userLogin()">Login</button>
-  <button class="back-btn" onclick="goBack()">Back</button>
+  <button onclick="userLogin()">Login / Register</button>
 </div>
 
-<!-- User Menu -->
-<div class="container" id="userMenu" style="display:none;">
+<!-- Customer Menu -->
+<div class="container" id="userMenu" style="display:none; max-height:80vh; overflow-y:auto;">
   <h2>Food Menu</h2>
-  <div id="menuList"></div>
+  <div id="menuList" class="menu-container"></div>
   <button class="back-btn" onclick="logout()">Logout</button>
 </div>
 
 <!-- Admin Login -->
 <div class="container" id="adminLogin" style="display:none;">
+  <button class="back-btn" onclick="goBack()">← Back</button>
   <h2>Admin Login</h2>
   <input type="password" id="adminPass" placeholder="Enter Password">
   <button onclick="adminLogin()">Login</button>
   <button onclick="showForgotPassword()">Forgot Password?</button>
-  <button class="back-btn" onclick="goBack()">Back</button>
 </div>
 
-<!-- Admin Panel -->
-<div class="container" id="adminPanel" style="display:none;">
+<!-- Admin Dashboard -->
+<div class="container" id="adminPanel" style="display:none; max-height:80vh; overflow-y:auto;">
+  <button class="back-btn" onclick="logout()">← Logout</button>
   <h2>Admin Panel</h2>
-  <input type="text" id="foodItem" placeholder="Add Food Item">
+  
+  <h3>Add Food Item</h3>
+  <input type="text" id="foodItem" placeholder="Food Name">
+  <input type="text" id="foodType" placeholder="Type: veg, nonveg, drinks">
+  <input type="text" id="foodImg" placeholder="Image URL">
   <button onclick="addFood()">Add Food</button>
-  <div id="menuListAdmin"></div>
+
+  <h3>Food List</h3>
+  <div id="menuListAdmin" class="menu-container"></div>
+
   <h3>Registered Users</h3>
-  <div id="userList"></div>
+  <div id="userList" class="menu-container"></div>
+
   <button onclick="showChangePassword()">Change Password</button>
-  <button class="back-btn" onclick="logout()">Logout</button>
 </div>
 
-<!-- Change Password -->
+<!-- Change Admin Password -->
 <div class="container" id="changePasswordBox" style="display:none;">
-  <h2>Change Password</h2>
+  <button class="back-btn" onclick="showAdminPanel()">← Back</button>
+  <h2>Change Admin Password</h2>
   <input type="password" id="oldPass" placeholder="Old Password">
   <input type="password" id="newPass" placeholder="New Password">
   <button onclick="changePassword()">Update Password</button>
-  <button class="back-btn" onclick="showAdminPanel()">Back</button>
 </div>
 
 <!-- Forgot Password -->
 <div class="container" id="forgotPasswordBox" style="display:none;">
+  <button class="back-btn" onclick="showAdminLogin()">← Back</button>
   <h2>Reset Admin Password</h2>
   <p>Enter secret key: <strong>foodadmin123</strong></p>
   <input type="password" id="secretKey" placeholder="Enter Secret Key">
   <input type="password" id="resetPass" placeholder="New Password">
   <button onclick="resetPassword()">Reset Password</button>
-  <button class="back-btn" onclick="showAdminLogin()">Back</button>
 </div>
 
 <script>
 let adminPassword = localStorage.getItem('adminPassword') || 'admin123';
 
-// User login/signup
-function showUserLogin() {
-  hideAll();
-  document.getElementById('userLogin').style.display = 'block';
-}
-function userLogin() {
+// Utility functions
+function hideAll(){ document.querySelectorAll('.container').forEach(c=>c.style.display='none'); }
+function goBack(){ hideAll(); document.getElementById('mainPage').style.display='block'; }
+function logout(){ goBack(); }
+
+// Customer login
+function showUserLogin(){ hideAll(); document.getElementById('userLogin').style.display='block'; }
+function userLogin(){
   const name = document.getElementById('userName').value.trim();
   const phone = document.getElementById('userPhone').value.trim();
-  if (!name || !phone) return alert('Please fill all fields');
-  
-  let users = JSON.parse(localStorage.getItem('users') || '[]');
-  if (!users.some(u => u.phone === phone)) {
-    users.push({ name, phone });
-    localStorage.setItem('users', JSON.stringify(users));
-  }
+  if(!name || !phone){ alert('Fill all fields'); return; }
+  let users = JSON.parse(localStorage.getItem('users')||'[]');
+  if(!users.some(u=>u.phone===phone)) { users.push({name,phone}); localStorage.setItem('users',JSON.stringify(users)); }
   showUserMenu();
+}
+function showUserMenu(){
+  hideAll(); document.getElementById('userMenu').style.display='block';
+  let foods = JSON.parse(localStorage.getItem('foods')||'[]');
+  let container = document.getElementById('menuList');
+  container.innerHTML = foods.length ? foods.map(f=>`<div><img src="${f.img}"><h4>${f.name}</h4><p>${f.type}</p></div>`).join('') : '<p>No food available</p>';
 }
 
 // Admin login
-function showAdminLogin() {
-  hideAll();
-  document.getElementById('adminLogin').style.display = 'block';
-}
-function adminLogin() {
+function showAdminLogin(){ hideAll(); document.getElementById('adminLogin').style.display='block'; }
+function adminLogin(){
   const pass = document.getElementById('adminPass').value;
-  if (pass === adminPassword) showAdminPanel();
-  else alert('Incorrect password');
+  if(pass===adminPassword) showAdminPanel(); else alert('Incorrect password');
 }
 
-// Forgot password
-function showForgotPassword() {
-  hideAll();
-  document.getElementById('forgotPasswordBox').style.display = 'block';
+// Admin panel
+function showAdminPanel(){ hideAll(); document.getElementById('adminPanel').style.display='block'; renderFoodsAdmin(); renderUsersAdmin(); }
+function addFood(){
+  const name = document.getElementById('foodItem').value.trim();
+  const type = document.getElementById('foodType').value.trim().toLowerCase();
+  const img = document.getElementById('foodImg').value.trim();
+  if(!name||!type||!img){ alert('Fill all fields'); return; }
+  let foods = JSON.parse(localStorage.getItem('foods')||'[]');
+  foods.push({name,type,img}); localStorage.setItem('foods',JSON.stringify(foods));
+  renderFoodsAdmin(); document.getElementById('foodItem').value=''; document.getElementById('foodType').value=''; document.getElementById('foodImg').value='';
 }
-function resetPassword() {
-  const key = document.getElementById('secretKey').value.trim();
-  const newPass = document.getElementById('resetPass').value.trim();
-  if (key === 'foodadmin123' && newPass) {
-    localStorage.setItem('adminPassword', newPass);
-    adminPassword = newPass;
-    alert('Password reset successful!');
-    showAdminLogin();
-  } else {
-    alert('Invalid secret key or empty password');
-  }
+function removeFood(i){ let foods = JSON.parse(localStorage.getItem('foods')||'[]'); foods.splice(i,1); localStorage.setItem('foods',JSON.stringify(foods)); renderFoodsAdmin(); }
+function renderFoodsAdmin(){
+  let foods = JSON.parse(localStorage.getItem('foods')||'[]');
+  document.getElementById('menuListAdmin').innerHTML = foods.map((f,i)=>`<div><img src="${f.img}"><b>${f.name}</b> (${f.type}) <button onclick="removeFood(${i})">Remove</button></div>`).join('');
 }
-
-// Admin Panel
-function showAdminPanel() {
-  hideAll();
-  document.getElementById('adminPanel').style.display = 'block';
-  renderMenuAdmin();
-  renderUsers();
-}
-function addFood() {
-  const item = document.getElementById('foodItem').value.trim();
-  if (!item) return alert('Enter food name');
-  let foods = JSON.parse(localStorage.getItem('foods') || '[]');
-  foods.push(item);
-  localStorage.setItem('foods', JSON.stringify(foods));
-  renderMenuAdmin();
-  document.getElementById('foodItem').value = '';
-}
-function removeFood(i) {
-  let foods = JSON.parse(localStorage.getItem('foods') || '[]');
-  foods.splice(i, 1);
-  localStorage.setItem('foods', JSON.stringify(foods));
-  renderMenuAdmin();
-}
-function renderMenuAdmin() {
-  const list = document.getElementById('menuListAdmin');
-  const foods = JSON.parse(localStorage.getItem('foods') || '[]');
-  list.innerHTML = foods.map((f, i) =>
-    `<div>${f} <button onclick="removeFood(${i})">Remove</button></div>`
-  ).join('');
-}
-function renderUsers() {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const list = document.getElementById('userList');
-  list.innerHTML = users.map(u => `<div>${u.name} - ${u.phone}</div>`).join('');
+function renderUsersAdmin(){
+  let users = JSON.parse(localStorage.getItem('users')||'[]');
+  document.getElementById('userList').innerHTML = users.map(u=>`<div>${u.name} - ${u.phone}</div>`).join('');
 }
 
 // Change Password
-function showChangePassword() {
-  hideAll();
-  document.getElementById('changePasswordBox').style.display = 'block';
-}
-function changePassword() {
+function showChangePassword(){ hideAll(); document.getElementById('changePasswordBox').style.display='block'; }
+function changePassword(){
   const oldPass = document.getElementById('oldPass').value;
   const newPass = document.getElementById('newPass').value;
-  if (oldPass === adminPassword && newPass) {
-    localStorage.setItem('adminPassword', newPass);
-    adminPassword = newPass;
-    alert('Password updated successfully!');
-    showAdminPanel();
-  } else {
-    alert('Incorrect old password or empty new password');
-  }
+  if(oldPass===adminPassword && newPass){ adminPassword=newPass; localStorage.setItem('adminPassword',newPass); alert('Password updated!'); showAdminPanel(); }
+  else alert('Incorrect old password or empty new password');
 }
 
-// User Menu
-function showUserMenu() {
-  hideAll();
-  document.getElementById('userMenu').style.display = 'block';
-  const foods = JSON.parse(localStorage.getItem('foods') || '[]');
-  document.getElementById('menuList').innerHTML =
-    foods.length ? foods.map(f => `<div>${f}</div>`).join('') : '<p>No food available</p>';
-}
-
-// Back, Logout, Helpers
-function hideAll() {
-  document.querySelectorAll('.container').forEach(el => el.style.display = 'none');
-}
-function goBack() {
-  hideAll();
-  document.getElementById('mainPage').style.display = 'block';
-}
-function logout() {
-  goBack();
+// Forgot Password
+function showForgotPassword(){ hideAll(); document.getElementById('forgotPasswordBox').style.display='block'; }
+function resetPassword(){
+  const key = document.getElementById('secretKey').value.trim();
+  const newPass = document.getElementById('resetPass').value.trim();
+  if(key==='foodadmin123' && newPass){ adminPassword=newPass; localStorage.setItem('adminPassword',newPass); alert('Password reset!'); showAdminLogin(); }
+  else alert('Invalid secret key or empty password');
 }
 </script>
 
