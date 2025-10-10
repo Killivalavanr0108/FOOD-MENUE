@@ -16,7 +16,7 @@ body, html {
 
 /* Container */
 .container {
-  width: 90%; max-width: 450px; padding: 25px;
+  width: 90%; max-width: 700px; padding: 25px;
   border-radius:15px;
   background: rgba(0, 230, 255, 0.08);
   text-align:center; margin:20px auto; position:relative;
@@ -51,32 +51,34 @@ button {
 button:hover { background:#00bcd4; box-shadow: 0 0 15px #00bcd4; }
 
 .back-btn{
-  background:#ff0066;color:#fff;margin-top:5px;
+  background:#ff0066;color:#fff;margin-top:10px;
   box-shadow: 0 0 10px #ff0066;
 }
 
-/* Menu Cards */
-.menu-container { margin-top:15px; }
+/* Menu Cards - Full Width */
+.menu-container { margin-top:15px; display:flex; flex-direction:column; }
 .menu-container div {
+  width: 100%;
   background: rgba(0, 238, 255, 0.1);
-  padding:10px; border-radius:12px; margin:5px 0;
+  padding:15px; border-radius:12px; margin:5px 0;
   box-shadow: 0 0 15px rgba(0, 238, 255, 0.2);
   transition: transform 0.2s, box-shadow 0.2s;
+  display:flex; flex-direction:column; align-items:center;
 }
 .menu-container div:hover {
   transform: translateY(-3px);
   box-shadow: 0 0 25px rgba(0, 238, 255, 0.4);
 }
 .menu-container img {
-  width:100%; height:100px; object-fit:cover;
-  border-radius:8px; margin-bottom:5px;
+  width:100%; height:200px; object-fit:cover;
+  border-radius:8px; margin-bottom:10px;
   filter: brightness(0.9) contrast(1.1);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .container { width: 90%; padding: 15px; }
-  .menu-container img { height:80px; }
+  .container { width: 95%; padding: 15px; }
+  .menu-container img { height:180px; }
 }
 </style>
 </head>
@@ -91,32 +93,31 @@ button:hover { background:#00bcd4; box-shadow: 0 0 15px #00bcd4; }
 
 <!-- Customer Login -->
 <div class="container" id="userLogin" style="display:none;">
-  <button class="back-btn" onclick="goBack()">← Back</button>
   <h2>Customer Login / Signup</h2>
   <input type="text" id="userName" placeholder="Full Name">
   <input type="tel" id="userPhone" placeholder="Phone Number" maxlength="10">
   <button onclick="userLogin()">Login / Register</button>
+  <button class="back-btn" onclick="goBack()">← Back</button>
 </div>
 
 <!-- Customer Menu -->
 <div class="container" id="userMenu" style="display:none; max-height:80vh; overflow-y:auto;">
   <h2>Food Menu</h2>
   <div id="menuList" class="menu-container"></div>
-  <button class="back-btn" onclick="logout()">Logout</button>
+  <button class="back-btn" onclick="logout()">← Back</button>
 </div>
 
 <!-- Admin Login -->
 <div class="container" id="adminLogin" style="display:none;">
-  <button class="back-btn" onclick="goBack()">← Back</button>
   <h2>Admin Login</h2>
   <input type="password" id="adminPass" placeholder="Enter Password">
   <button onclick="adminLogin()">Login</button>
   <button onclick="showForgotPassword()">Forgot Password?</button>
+  <button class="back-btn" onclick="goBack()">← Back</button>
 </div>
 
 <!-- Admin Dashboard -->
 <div class="container" id="adminPanel" style="display:none; max-height:80vh; overflow-y:auto;">
-  <button class="back-btn" onclick="logout()">← Logout</button>
   <h2>Admin Panel</h2>
   
   <h3>Add Food Item</h3>
@@ -132,25 +133,26 @@ button:hover { background:#00bcd4; box-shadow: 0 0 15px #00bcd4; }
   <div id="userList" class="menu-container"></div>
 
   <button onclick="showChangePassword()">Change Password</button>
+  <button class="back-btn" onclick="logout()">← Logout</button>
 </div>
 
 <!-- Change Admin Password -->
 <div class="container" id="changePasswordBox" style="display:none;">
-  <button class="back-btn" onclick="showAdminPanel()">← Back</button>
   <h2>Change Admin Password</h2>
   <input type="password" id="oldPass" placeholder="Old Password">
   <input type="password" id="newPass" placeholder="New Password">
   <button onclick="changePassword()">Update Password</button>
+  <button class="back-btn" onclick="showAdminPanel()">← Back</button>
 </div>
 
 <!-- Forgot Password -->
 <div class="container" id="forgotPasswordBox" style="display:none;">
-  <button class="back-btn" onclick="showAdminLogin()">← Back</button>
   <h2>Reset Admin Password</h2>
   <p>Enter secret key: <strong>foodadmin123</strong></p>
   <input type="password" id="secretKey" placeholder="Enter Secret Key">
   <input type="password" id="resetPass" placeholder="New Password">
   <button onclick="resetPassword()">Reset Password</button>
+  <button class="back-btn" onclick="showAdminLogin()">← Back</button>
 </div>
 
 <script>
